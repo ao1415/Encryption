@@ -39,12 +39,20 @@ namespace Encryption
 		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
 		private void encryptionButton_Click(object sender, EventArgs e)
 		{
+			if (!File.Exists(fileNameTextBox.Text))
+			{
+				MessageBox.Show("入力されたファイルは存在しません", "警告", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
 
 			DialogResult result = saveFileDialog.ShowDialog();
 
 			if (result == DialogResult.OK)
 			{
-				FileEncrypt(fileNameTextBox.Text, saveFileDialog.FileName, passwordTextBox.Text);
+				string text = File.ReadAllText(fileNameTextBox.Text, System.Text.Encoding.GetEncoding("shift_jis"));
+
+				byte[] data = StringEncrypt(text, passwordTextBox.Text);
+				File.WriteAllBytes(saveFileDialog.FileName, data);
 
 				DialogResult select = MessageBox.Show("ファイルを保存しました\n元ファイルを削除しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -65,118 +73,133 @@ namespace Encryption
 		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
 		private void decryptionButton_Click(object sender, EventArgs e)
 		{
+			if (!File.Exists(fileNameTextBox.Text))
+			{
+				MessageBox.Show("入力されたファイルは存在しません", "警告", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
 
-			string text = FileDecrypt(fileNameTextBox.Text, passwordTextBox.Text);
+			byte[] data = File.ReadAllBytes(fileNameTextBox.Text);
 
-			TextViewer textViewer = new TextViewer(this, text);
+			try
+			{
+				string text = BinaryDecrypt(data, passwordTextBox.Text);
 
-			textViewer.ShowDialog();
+				TextViewer textViewer = new TextViewer(this, Path.GetFileName(fileNameTextBox.Text), text);
+				textViewer.ShowDialog();
+			}
+			catch (CryptographicException)
+			{
+				MessageBox.Show("パスワードが間違っています", "警告", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
 
+		}
+
+		public void saveString(string text)
+		{
+			byte[] data = StringEncrypt(text, passwordTextBox.Text);
+			File.WriteAllBytes(fileNameTextBox.Text, data);
 		}
 
 		private static readonly int BlockSize = 128;
 		private static readonly int KeySize = 256;
+		private static readonly int ByteSize = 16;
 
-		private bool FileEncrypt(string inFilePath, string outFilePath, string password)
+		private byte[] StringEncrypt(string str, string password)
 		{
-			using (FileStream outfs = new FileStream(outFilePath, FileMode.Create, FileAccess.Write))
+			byte[] binary;
+			using (AesManaged aes = new AesManaged())
 			{
-				using (AesManaged aes = new AesManaged())
+				aes.BlockSize = BlockSize;
+				aes.KeySize = KeySize;
+				aes.Mode = CipherMode.CBC;
+				aes.Padding = PaddingMode.PKCS7;
+
+				Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password, ByteSize);
+				byte[] salt = new byte[ByteSize];
+				salt = deriveBytes.Salt;
+				byte[] bufferKey = deriveBytes.GetBytes(ByteSize);
+
+				aes.Key = bufferKey;
+				aes.GenerateIV();
+
+				ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+				using (MemoryStream data = new MemoryStream(Encoding.GetEncoding("shift_jis").GetBytes(str)))
 				{
-					aes.BlockSize = BlockSize;              // BlockSize = 16bytes
-					aes.KeySize = KeySize;                // KeySize = 16bytes
-					aes.Mode = CipherMode.CBC;        // CBC mode
-					aes.Padding = PaddingMode.PKCS7;    // Padding mode is "PKCS7".
-
-					//入力されたパスワードをベースに擬似乱数を新たに生成
-					Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password, 16);
-					byte[] salt = new byte[16]; // Rfc2898DeriveBytesが内部生成したなソルトを取得
-					salt = deriveBytes.Salt;
-					// 生成した擬似乱数から16バイト切り出したデータをパスワードにする
-					byte[] bufferKey = deriveBytes.GetBytes(16);
-
-					aes.Key = bufferKey;
-					// IV ( Initilization Vector ) は、AesManagedにつくらせる
-					aes.GenerateIV();
-
-					//Encryption interface.
-					ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-					using (CryptoStream cse = new CryptoStream(outfs, encryptor, CryptoStreamMode.Write))
+					using (MemoryStream ms = new MemoryStream())
 					{
-						outfs.Write(salt, 0, 16);     // salt をファイル先頭に埋め込む
-						outfs.Write(aes.IV, 0, 16); // 次にIVもファイルに埋め込む
-						using (DeflateStream ds = new DeflateStream(cse, CompressionMode.Compress)) //圧縮
+						using (CryptoStream cse = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
 						{
-							using (FileStream fs = new FileStream(inFilePath, FileMode.Open, FileAccess.Read))
+							ms.Write(salt, 0, ByteSize);
+							ms.Write(aes.IV, 0, ByteSize);
+
+							using (DeflateStream ds = new DeflateStream(cse, CompressionMode.Compress))
 							{
 								int len;
 								byte[] buffer = new byte[4096];
 
-								while ((len = fs.Read(buffer, 0, 4096)) > 0)
+								while ((len = data.Read(buffer, 0, 4096)) > 0)
 								{
 									ds.Write(buffer, 0, len);
 								}
 							}
 						}
-
+						binary = ms.ToArray();
 					}
-
 				}
 			}
 
-			return true;
+			return binary;
 		}
 
-		private string FileDecrypt(string filePath, string password)
+		private string BinaryDecrypt(byte[] data, string password)
 		{
-			string text = "";
+			string str = "";
 
-			using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			using (MemoryStream ms = new MemoryStream(data))
 			{
 				using (AesManaged aes = new AesManaged())
 				{
-					aes.BlockSize = BlockSize;              // BlockSize = 16bytes
-					aes.KeySize = KeySize;                // KeySize = 16bytes
-					aes.Mode = CipherMode.CBC;        // CBC mode
-					aes.Padding = PaddingMode.PKCS7;    // Padding mode is "PKCS7".
+					aes.BlockSize = BlockSize;
+					aes.KeySize = KeySize;
+					aes.Mode = CipherMode.CBC;
+					aes.Padding = PaddingMode.PKCS7;
 
-					// salt
-					byte[] salt = new byte[16];
-					fs.Read(salt, 0, 16);
+					byte[] salt = new byte[ByteSize];
+					ms.Read(salt, 0, ByteSize);
 
-					// Initilization Vector
-					byte[] iv = new byte[16];
-					fs.Read(iv, 0, 16);
+					byte[] iv = new byte[ByteSize];
+					ms.Read(iv, 0, ByteSize);
 					aes.IV = iv;
 
-					// ivをsaltにしてパスワードを擬似乱数に変換
 					Rfc2898DeriveBytes deriveBytes = new Rfc2898DeriveBytes(password, salt);
-					byte[] bufferKey = deriveBytes.GetBytes(16);    // 16バイトのsaltを切り出してパスワードに変換
+					byte[] bufferKey = deriveBytes.GetBytes(ByteSize);
 					aes.Key = bufferKey;
 
-					//Decryption interface.
 					ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-					using (CryptoStream cse = new CryptoStream(fs, decryptor, CryptoStreamMode.Read))
+					using (MemoryStream text = new MemoryStream())
 					{
-						using (DeflateStream ds = new DeflateStream(cse, CompressionMode.Decompress))   //解凍
+						using (CryptoStream cse = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
 						{
-							int len;
-							byte[] buffer = new byte[4096];
-
-							while ((len = ds.Read(buffer, 0, 4096)) > 0)
+							using (DeflateStream ds = new DeflateStream(cse, CompressionMode.Decompress))   //解凍
 							{
-								text += Encoding.GetEncoding("shift_jis").GetString(buffer, 0, len);
+								int len;
+								byte[] buffer = new byte[4096];
+
+								while ((len = ds.Read(buffer, 0, 4096)) > 0)
+								{
+									text.Write(buffer, 0, len);
+								}
 							}
 						}
+						str = Encoding.GetEncoding("shift_jis").GetString(text.ToArray());
 					}
 				}
 			}
-
-			return text;
+			return str;
 		}
-
 
 	}
 }

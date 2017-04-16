@@ -43,8 +43,11 @@
 			this.textBox.Location = new System.Drawing.Point(12, 27);
 			this.textBox.Multiline = true;
 			this.textBox.Name = "textBox";
+			this.textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
 			this.textBox.Size = new System.Drawing.Size(260, 222);
 			this.textBox.TabIndex = 0;
+			this.textBox.WordWrap = false;
+			this.textBox.TextChanged += new System.EventHandler(this.textBox_TextChanged);
 			// 
 			// menuStrip1
 			// 
@@ -68,8 +71,8 @@
 			// 
 			this.保存SToolStripMenuItem.Name = "保存SToolStripMenuItem";
 			this.保存SToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-			this.保存SToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.保存SToolStripMenuItem.Text = "保存(&S)";
+			this.保存SToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.保存SToolStripMenuItem.Text = "上書き保存(&S)";
 			this.保存SToolStripMenuItem.Click += new System.EventHandler(this.保存SToolStripMenuItem_Click);
 			// 
 			// TextViewer
@@ -82,6 +85,7 @@
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "TextViewer";
 			this.Text = "テキストビューワー";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TextViewer_FormClosing);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);

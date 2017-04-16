@@ -12,19 +12,56 @@ namespace Encryption
 {
 	public partial class TextViewer : Form
 	{
-		Form launcher;
+		Launcher launcher;
 
-		public TextViewer(Form _launcher, string _text)
+		private bool change = false;
+		private readonly string FileName;
+
+		public TextViewer(Form _launcher, string fileName, string _text)
 		{
 			InitializeComponent();
 
-			launcher = _launcher;
+			launcher = (Launcher)_launcher;
+			FileName = fileName;
 			textBox.Text = _text;
+			change = false;
+			Text = FileName;
 		}
 
 		private void 保存SToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			launcher.saveString(textBox.Text);
+			Text = FileName;
+			change = false;
+		}
 
+		private void textBox_TextChanged(object sender, EventArgs e)
+		{
+			Text = FileName + "*";
+			change = true;
+		}
+
+		private void TextViewer_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (change)
+			{
+				DialogResult result = MessageBox.Show("ファイルの内容が変更されています\n保存しますか？", "確認", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+				switch (result)
+				{
+					case DialogResult.Cancel:
+						e.Cancel = true;
+						break;
+					case DialogResult.Yes:
+						保存SToolStripMenuItem_Click(null, null);
+						break;
+					case DialogResult.No:
+						break;
+					default:
+						break;
+				}
+
+			}
 		}
 	}
 }
