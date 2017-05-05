@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TextViewer));
 			this.textBox = new System.Windows.Forms.TextBox();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.ファイルToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +45,7 @@
 			this.textBox.Multiline = true;
 			this.textBox.Name = "textBox";
 			this.textBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.textBox.Size = new System.Drawing.Size(260, 222);
+			this.textBox.Size = new System.Drawing.Size(440, 322);
 			this.textBox.TabIndex = 0;
 			this.textBox.WordWrap = false;
 			this.textBox.TextChanged += new System.EventHandler(this.textBox_TextChanged);
@@ -55,7 +56,7 @@
             this.ファイルToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(284, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(464, 24);
 			this.menuStrip1.TabIndex = 1;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -79,9 +80,10 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(284, 261);
+			this.ClientSize = new System.Drawing.Size(464, 361);
 			this.Controls.Add(this.textBox);
 			this.Controls.Add(this.menuStrip1);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "TextViewer";
 			this.Text = "テキストビューワー";

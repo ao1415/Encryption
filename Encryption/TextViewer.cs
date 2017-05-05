@@ -24,15 +24,21 @@ namespace Encryption
 			launcher = (Launcher)_launcher;
 			FileName = fileName;
 			textBox.Text = _text;
+			textBox.SelectionStart = 0;
 			change = false;
 			Text = FileName;
 		}
 
 		private void 保存SToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			launcher.saveString(textBox.Text);
-			Text = FileName;
-			change = false;
+			var result = MessageBox.Show("上書き保存しますか?", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+			if (result == DialogResult.Yes)
+			{
+				launcher.saveString(textBox.Text);
+				Text = FileName;
+				change = false;
+			}
 		}
 
 		private void textBox_TextChanged(object sender, EventArgs e)

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Launcher));
 			this.fileOpenButton = new System.Windows.Forms.Button();
 			this.fileNameTextBox = new System.Windows.Forms.TextBox();
 			this.fileName = new System.Windows.Forms.Label();
@@ -42,7 +43,7 @@
 			// fileOpenButton
 			// 
 			this.fileOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.fileOpenButton.Location = new System.Drawing.Point(377, 26);
+			this.fileOpenButton.Location = new System.Drawing.Point(163, 13);
 			this.fileOpenButton.Name = "fileOpenButton";
 			this.fileOpenButton.Size = new System.Drawing.Size(75, 23);
 			this.fileOpenButton.TabIndex = 0;
@@ -52,16 +53,18 @@
 			// 
 			// fileNameTextBox
 			// 
-			this.fileNameTextBox.Location = new System.Drawing.Point(12, 28);
+			this.fileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.fileNameTextBox.Location = new System.Drawing.Point(12, 41);
 			this.fileNameTextBox.Name = "fileNameTextBox";
-			this.fileNameTextBox.Size = new System.Drawing.Size(359, 19);
+			this.fileNameTextBox.Size = new System.Drawing.Size(226, 19);
 			this.fileNameTextBox.TabIndex = 1;
 			// 
 			// fileName
 			// 
 			this.fileName.AutoSize = true;
 			this.fileName.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-			this.fileName.Location = new System.Drawing.Point(12, 9);
+			this.fileName.Location = new System.Drawing.Point(12, 13);
 			this.fileName.Name = "fileName";
 			this.fileName.Size = new System.Drawing.Size(77, 16);
 			this.fileName.TabIndex = 2;
@@ -69,7 +72,7 @@
 			// 
 			// encryptionButton
 			// 
-			this.encryptionButton.Location = new System.Drawing.Point(12, 94);
+			this.encryptionButton.Location = new System.Drawing.Point(12, 107);
 			this.encryptionButton.Name = "encryptionButton";
 			this.encryptionButton.Size = new System.Drawing.Size(75, 23);
 			this.encryptionButton.TabIndex = 3;
@@ -81,16 +84,17 @@
 			// 
 			this.passwordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.passwordTextBox.Location = new System.Drawing.Point(12, 69);
+			this.passwordTextBox.Location = new System.Drawing.Point(12, 82);
 			this.passwordTextBox.Name = "passwordTextBox";
-			this.passwordTextBox.Size = new System.Drawing.Size(440, 19);
+			this.passwordTextBox.PasswordChar = '*';
+			this.passwordTextBox.Size = new System.Drawing.Size(226, 19);
 			this.passwordTextBox.TabIndex = 4;
 			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
 			this.label2.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-			this.label2.Location = new System.Drawing.Point(12, 50);
+			this.label2.Location = new System.Drawing.Point(12, 63);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(78, 16);
 			this.label2.TabIndex = 5;
@@ -99,7 +103,7 @@
 			// decryptionButton
 			// 
 			this.decryptionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.decryptionButton.Location = new System.Drawing.Point(377, 94);
+			this.decryptionButton.Location = new System.Drawing.Point(163, 107);
 			this.decryptionButton.Name = "decryptionButton";
 			this.decryptionButton.Size = new System.Drawing.Size(75, 23);
 			this.decryptionButton.TabIndex = 6;
@@ -120,7 +124,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(464, 126);
+			this.ClientSize = new System.Drawing.Size(250, 142);
 			this.Controls.Add(this.decryptionButton);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.passwordTextBox);
@@ -129,6 +133,7 @@
 			this.Controls.Add(this.fileNameTextBox);
 			this.Controls.Add(this.fileOpenButton);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "Launcher";
 			this.Text = "ランチャー";
 			this.ResumeLayout(false);

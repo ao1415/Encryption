@@ -45,6 +45,13 @@ namespace Encryption
 				return;
 			}
 
+			Form passwordForm = new PasswordInputForm(passwordTextBox.Text);
+
+			if (passwordForm.ShowDialog() != DialogResult.OK)
+			{
+				return;
+			}
+
 			DialogResult result = saveFileDialog.ShowDialog();
 
 			if (result == DialogResult.OK)
